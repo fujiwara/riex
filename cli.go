@@ -7,9 +7,9 @@ import (
 )
 
 type Option struct {
-	Active   bool `help:"Show active reserved instances."`
-	Expired  int  `help:"Show expired reserved instances in specified days"`
-	Duration int  `arg:"" help:"Show reserved instances will be expired in specified days"`
+	Active  bool `help:"Show active reserved instances."`
+	Expired int  `help:"Show reserved instances expired in the last specified days."`
+	Days    int  `arg:"" help:"Show reserved instances that will be expired within specified days."`
 }
 
 func RunCLI(ctx context.Context, args []string) error {

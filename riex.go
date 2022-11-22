@@ -53,7 +53,7 @@ func New(ctx context.Context, opt *Option) (*Riex, error) {
 		opensearch:  opensearch.NewFromConfig(awscfg),
 		option:      opt,
 		startTime:   now.Add(time.Duration(-opt.Expired) * 24 * time.Hour),
-		endTime:     now.Add(time.Duration(opt.Duration) * 24 * time.Hour),
+		endTime:     now.Add(time.Duration(opt.Days) * 24 * time.Hour),
 	}
 	return app, nil
 }
