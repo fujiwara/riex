@@ -3,9 +3,11 @@ package riex
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -88,7 +90,66 @@ func (app *Riex) Run(ctx context.Context) error {
 	sort.SliceStable(ris, func(i, j int) bool {
 		return ris[i].StartTime.Before(ris[j].StartTime)
 	})
-	return ris.Print(os.Stdout)
+	return app.Print(ris, os.Stdout)
+}
+
+func (app *Riex) Print(ris ReservedInstances, w io.Writer) error {
+	switch app.option.Format {
+	case "json":
+		return app.printJSON(ris, w)
+	case "markdown":
+		return app.printMarkdown(ris, w)
+	case "tsv":
+		return app.printTSV(ris, w)
+	default:
+		return app.printJSON(ris, w)
+	}
+}
+
+func (app *Riex) printJSON(ris ReservedInstances, w io.Writer) error {
+	enc := json.NewEncoder(w)
+	// enc.SetIndent("", "  ")
+	for _, ri := range ris {
+		if err := enc.Encode(ri); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (app *Riex) printMarkdown(ris ReservedInstances, w io.Writer) error {
+	fmt.Fprintln(w, "| service | name | description | instance_type | count | start_time | end_time | state |")
+	fmt.Fprintln(w, "| --- | --- | --- | --- | --- | --- | --- | --- |")
+	for _, ri := range ris {
+		fmt.Fprintf(w,
+			"| %s | %s | %s | %s | %d | %s | %s | %s |\n",
+			ri.Service, ri.Name, ri.Description, ri.InstanceType,
+			ri.Count, ri.StartTime.Format(time.RFC3339), ri.EndTime.Format(time.RFC3339),
+			ri.State,
+		)
+	}
+	return nil
+}
+
+func (app *Riex) printTSV(ris ReservedInstances, w io.Writer) error {
+	fields := []string{"service", "name", "description", "instance_type", "count", "start_time", "end_time", "state"}
+	header := strings.Join(fields, "\t")
+	fmt.Fprintln(w, header)
+
+	for _, ri := range ris {
+		row := []string{
+			ri.Service,
+			ri.Name,
+			ri.Description,
+			ri.InstanceType,
+			strconv.Itoa(ri.Count),
+			ri.StartTime.Format(time.RFC3339),
+			ri.EndTime.Format(time.RFC3339),
+			ri.State,
+		}
+		fmt.Fprintln(w, strings.Join(row, "\t"))
+	}
+	return nil
 }
 
 func (app *Riex) isPrintable(ri ReservedInstance) bool {
@@ -113,14 +174,3 @@ type ReservedInstance struct {
 }
 
 type ReservedInstances []ReservedInstance
-
-func (ris ReservedInstances) Print(w io.Writer) error {
-	enc := json.NewEncoder(w)
-	// enc.SetIndent("", "  ")
-	for _, ri := range ris {
-		if err := enc.Encode(ri); err != nil {
-			return err
-		}
-	}
-	return nil
-}
