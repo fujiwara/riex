@@ -96,28 +96,36 @@ func (app *Riex) Run(ctx context.Context) error {
 func (app *Riex) Print(ris ReservedInstances, w io.Writer) error {
 	switch app.option.Format {
 	case "json":
-		return app.printJSON(ris, w)
+		return app.PrintJSON(ris, w)
 	case "markdown":
-		return app.printMarkdown(ris, w)
+		return app.PrintMarkdown(ris, w)
 	case "tsv":
-		return app.printTSV(ris, w)
+		return app.PrintTSV(ris, w)
 	default:
-		return app.printJSON(ris, w)
+		return app.PrintJSON(ris, w)
 	}
 }
 
-func (app *Riex) printJSON(ris ReservedInstances, w io.Writer) error {
-	enc := json.NewEncoder(w)
-	// enc.SetIndent("", "  ")
+func (app *Riex) PrintJSON(ris ReservedInstances, w io.Writer) error {
 	for _, ri := range ris {
-		if err := enc.Encode(ri); err != nil {
+		// trucate time.Time to second
+		ri.StartTime = ri.StartTime.Truncate(time.Second)
+		ri.EndTime = ri.EndTime.Truncate(time.Second)
+		data, err := json.Marshal(ri)
+		if err != nil {
+			return err
+		}
+		if _, err := w.Write(data); err != nil {
+			return err
+		}
+		if _, err := w.Write([]byte("\n")); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (app *Riex) printMarkdown(ris ReservedInstances, w io.Writer) error {
+func (app *Riex) PrintMarkdown(ris ReservedInstances, w io.Writer) error {
 	fmt.Fprintln(w, "| service | name | description | instance_type | count | start_time | end_time | state |")
 	fmt.Fprintln(w, "| --- | --- | --- | --- | --- | --- | --- | --- |")
 	for _, ri := range ris {
@@ -131,7 +139,7 @@ func (app *Riex) printMarkdown(ris ReservedInstances, w io.Writer) error {
 	return nil
 }
 
-func (app *Riex) printTSV(ris ReservedInstances, w io.Writer) error {
+func (app *Riex) PrintTSV(ris ReservedInstances, w io.Writer) error {
 	fields := []string{"service", "name", "description", "instance_type", "count", "start_time", "end_time", "state"}
 	header := strings.Join(fields, "\t")
 	fmt.Fprintln(w, header)
