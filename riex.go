@@ -126,6 +126,9 @@ func (app *Riex) PrintJSON(ris ReservedInstances, w io.Writer) error {
 }
 
 func (app *Riex) PrintMarkdown(ris ReservedInstances, w io.Writer) error {
+	if len(ris) == 0 {
+		return nil
+	}
 	fmt.Fprintln(w, "| service | name | description | instance_type | count | start_time | end_time | state |")
 	fmt.Fprintln(w, "| --- | --- | --- | --- | --- | --- | --- | --- |")
 	for _, ri := range ris {
@@ -140,6 +143,9 @@ func (app *Riex) PrintMarkdown(ris ReservedInstances, w io.Writer) error {
 }
 
 func (app *Riex) PrintTSV(ris ReservedInstances, w io.Writer) error {
+	if len(ris) == 0 {
+		return nil
+	}
 	fields := []string{"service", "name", "description", "instance_type", "count", "start_time", "end_time", "state"}
 	header := strings.Join(fields, "\t")
 	fmt.Fprintln(w, header)
