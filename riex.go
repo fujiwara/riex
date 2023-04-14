@@ -60,6 +60,28 @@ func New(ctx context.Context, opt *Option) (*Riex, error) {
 	return app, nil
 }
 
+func (app *Riex) RunForDummy(ctx context.Context, endTime time.Time) error {
+	now := time.Now()
+	ri := ReservedInstance{
+		Service:      "DummyService",
+		InstanceType: "dummy.t3.micro",
+		Name:         "dummy reservation",
+		Description:  "dummy description",
+		Count:        1,
+		StartTime:    endTime.Add(-time.Duration(1) * 24 * time.Hour * 365),
+		EndTime:      endTime,
+	}
+	if now.Before(ri.EndTime) {
+		ri.State = "active"
+	} else {
+		ri.State = "expired"
+	}
+	if app.isPrintable(ri) {
+		return app.Print([]ReservedInstance{ri}, os.Stdout)
+	}
+	return nil
+}
+
 func (app *Riex) Run(ctx context.Context) error {
 	funcs := []func(context.Context) (*ReservedInstances, error){
 		app.detectEC2,

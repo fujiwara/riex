@@ -58,6 +58,33 @@ $ riex 30 --expired 60
 {"service":"Redshift","name":"140aad98-3ab6-435d-bcd4-60d1e65375bc","description":"","instance_type":"ra3.xlplus","count":1,"start_time":"2021-12-21T09:17:32.937Z","end_time":"2022-12-21T09:17:32.937Z","state":"active"}
 ```
 
+### GitHub Actions
+
+`fujiwara/riex@v0` composite action can be used in GitHub Actions.
+This action checks RI expiration and create an issue if RI will be expired within specified days. (default: 30 days)
+
+```yaml
+name: Check RI Expiration
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  check_ri_expiration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check RI expiration
+        uses: fujiwara/riex@v0
+        with:
+          days_left: '30'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # or use aws-actions/configure-aws-credentials in before step
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'your-aws-region'
+
+
 ## LICENSE
 
 MIT
