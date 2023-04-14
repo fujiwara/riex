@@ -25,7 +25,7 @@ runs:
 
     - name: Check RI expiration and create an issue if necessary
       run: |
-        set -x
+        set +x
         days_left=${{ inputs.days_left }}
         if [[ "${{ inputs.dummy_end_time }}" != "" ]]; then
           opts="--dummy-output --dummy-end-time ${{ inputs.dummy_end_time }}"
