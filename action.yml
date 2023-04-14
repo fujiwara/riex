@@ -10,7 +10,6 @@ inputs:
     required: false
   version:
     description: "Version of riex to use"
-    required: true
     default: "0.0.5"
 
 runs:
