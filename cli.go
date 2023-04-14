@@ -2,15 +2,18 @@ package riex
 
 import (
 	"context"
+	"time"
 
 	"github.com/alecthomas/kong"
 )
 
 type Option struct {
-	Active  bool   `help:"Show active reserved instances."`
-	Expired int    `help:"Show reserved instances expired in the last specified days."`
-	Days    int    `arg:"" help:"Show reserved instances that will be expired within specified days."`
-	Format  string `enum:"json,markdown,tsv" help:"Output format.(json, markdown, tsv)" default:"json"`
+	Active       bool      `help:"Show active reserved instances."`
+	Expired      int       `help:"Show reserved instances expired in the last specified days."`
+	Days         int       `arg:"" help:"Show reserved instances that will be expired within specified days."`
+	Format       string    `enum:"json,markdown,tsv" help:"Output format.(json, markdown, tsv)" default:"json"`
+	DummyOutput  bool      `help:"Dummy output for testing."`
+	DummyEndTime time.Time `help:"Endtime for testing. works only with --dummy-output."`
 }
 
 func RunCLI(ctx context.Context, args []string) error {
@@ -26,5 +29,9 @@ func RunCLI(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-	return app.Run(ctx)
+	if cli.DummyOutput {
+		return app.RunForDummy(ctx, cli.DummyEndTime)
+	} else {
+		return app.Run(ctx)
+	}
 }
