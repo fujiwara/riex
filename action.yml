@@ -45,9 +45,9 @@ runs:
 
         if [ -z "$existing_issue" ]; then
           # Check if there's a closed issue with the same title
-          last_closed_issue=$(gh issue list --search "$issue_title" --state closed --json 'number,body' -q 'first(1) | .[] | .number')
+          last_closed_issue=$(gh issue list --search 'RI Expiring in 1 Days' --state closed --json number,body | jq '[.[] | {number: .number, body: .body}] | first')
 
-          if [ -z "$last_closed_issue" ]; then
+          if [[ "$last_closed_issue" == "null" ]]; then
             # Create a new issue only if no open issue exists and there is no closed issue with the same title
             gh issue create --title "$issue_title" --body "$issue_body"
           else
