@@ -38,7 +38,12 @@ runs:
         fi
 
         issue_title="RI Expiring in $days_left Days"
-        issue_body="The following Reserved Instances are expiring within $days_left days:\n\n$output"
+        issue_body=$(cat <<END
+        The following Reserved Instances are expiring within $days_left days:
+
+        $output
+        END
+        )
 
         # Check if an issue with the same title already exists
         existing_issue=$(gh issue list --search "$issue_title" --state open --json 'number,body' -q '.[] | .number')
