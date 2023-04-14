@@ -44,23 +44,7 @@ runs:
         $output
         END
         )
-
-        # Check if an issue with the same title already exists
-        existing_issue=$(gh issue list --search "$issue_title" --state open --json 'number,body' -q '.[] | .number')
-
-        if [ -z "$existing_issue" ]; then
-          # Check if there's a closed issue with the same title
-          last_closed_issue=$(gh issue list --search 'RI Expiring in 1 Days' --state closed --json number,body | jq '[.[] | {number: .number, body: .body}] | first')
-
-          if [[ "$last_closed_issue" == "null" ]]; then
-            # Create a new issue only if no open issue exists and there is no closed issue with the same title
-            gh issue create --title "$issue_title" --body "$issue_body"
-          else
-            echo "A closed issue with the same title already exists: Issue #$last_closed_issue"
-          fi
-        else
-          echo "An open issue with the same title already exists: Issue #$existing_issue"
-        fi
+        gh issue create --title "$issue_title" --body "$issue_body"
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
