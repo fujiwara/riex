@@ -26,13 +26,12 @@ import (
 var Version string
 
 type Riex struct {
-	config         aws.Config
-	ec2            *ec2.Client
-	elasticache    *elasticache.Client
-	rds            *rds.Client
-	redshift       *redshift.Client
-	opensearch     *opensearch.Client
-	recognizedTags map[string]string
+	config      aws.Config
+	ec2         *ec2.Client
+	elasticache *elasticache.Client
+	rds         *rds.Client
+	redshift    *redshift.Client
+	opensearch  *opensearch.Client
 
 	option    *Option
 	startTime time.Time
@@ -48,16 +47,15 @@ func New(ctx context.Context, opt *Option) (*Riex, error) {
 
 	now := time.Now()
 	app := &Riex{
-		config:         awscfg,
-		ec2:            ec2.NewFromConfig(awscfg),
-		elasticache:    elasticache.NewFromConfig(awscfg),
-		rds:            rds.NewFromConfig(awscfg),
-		redshift:       redshift.NewFromConfig(awscfg),
-		opensearch:     opensearch.NewFromConfig(awscfg),
-		option:         opt,
-		startTime:      now.Add(time.Duration(-opt.Expired) * 24 * time.Hour),
-		endTime:        now.Add(time.Duration(opt.Days) * 24 * time.Hour),
-		recognizedTags: opt.RecognizedTags,
+		config:      awscfg,
+		ec2:         ec2.NewFromConfig(awscfg),
+		elasticache: elasticache.NewFromConfig(awscfg),
+		rds:         rds.NewFromConfig(awscfg),
+		redshift:    redshift.NewFromConfig(awscfg),
+		opensearch:  opensearch.NewFromConfig(awscfg),
+		option:      opt,
+		startTime:   now.Add(time.Duration(-opt.Expired) * 24 * time.Hour),
+		endTime:     now.Add(time.Duration(opt.Days) * 24 * time.Hour),
 	}
 	return app, nil
 }
@@ -191,8 +189,8 @@ func (app *Riex) PrintTSV(ris ReservedInstances, w io.Writer) error {
 }
 
 func (app *Riex) isPrintable(ri ReservedInstance) bool {
-	if len(app.recognizedTags) > 0 {
-		for key, recognizedValue := range app.recognizedTags {
+	if !app.option.Recognized && len(app.option.RecognizedTags) > 0 {
+		for key, recognizedValue := range app.option.RecognizedTags {
 			if v, ok := ri.Tags[key]; ok && recognizedValue == v {
 				return false
 			}

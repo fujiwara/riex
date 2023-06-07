@@ -9,6 +9,7 @@ import (
 
 type Option struct {
 	Active         bool              `help:"Show active reserved instances."`
+	Recognized     bool              `help:"Show recognized reserved instances."`
 	Expired        int               `help:"Show reserved instances expired in the last specified days."`
 	Days           int               `arg:"" help:"Show reserved instances that will be expired within specified days."`
 	Format         string            `enum:"json,markdown,tsv" help:"Output format.(json, markdown, tsv)" default:"json"`
