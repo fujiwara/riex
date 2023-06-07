@@ -8,12 +8,13 @@ import (
 )
 
 type Option struct {
-	Active       bool      `help:"Show active reserved instances."`
-	Expired      int       `help:"Show reserved instances expired in the last specified days."`
-	Days         int       `arg:"" help:"Show reserved instances that will be expired within specified days."`
-	Format       string    `enum:"json,markdown,tsv" help:"Output format.(json, markdown, tsv)" default:"json"`
-	DummyOutput  bool      `help:"Dummy output for testing."`
-	DummyEndTime time.Time `help:"Endtime for testing. works only with --dummy-output."`
+	Active         bool              `help:"Show active reserved instances."`
+	Expired        int               `help:"Show reserved instances expired in the last specified days."`
+	Days           int               `arg:"" help:"Show reserved instances that will be expired within specified days."`
+	Format         string            `enum:"json,markdown,tsv" help:"Output format.(json, markdown, tsv)" default:"json"`
+	DummyOutput    bool              `help:"Dummy output for testing."`
+	DummyEndTime   time.Time         `help:"Endtime for testing. works only with --dummy-output."`
+	RecognizedTags map[string]string `help:"Resource tag for recognized RI." default:"riex=recognized"`
 }
 
 func RunCLI(ctx context.Context, args []string) error {
