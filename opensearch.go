@@ -28,6 +28,7 @@ func (app *Riex) detectOpensearch(ctx context.Context) (*ReservedInstances, erro
 				StartTime:    aws.ToTime(node.StartTime),
 				EndTime:      node.StartTime.Add(time.Second * time.Duration(node.Duration)),
 				State:        aws.ToString(node.State),
+				Tags:         make(map[string]string), // opeansearch reserved instance does not support tags
 			}
 			if app.isPrintable(ri) {
 				ris = append(ris, ri)

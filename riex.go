@@ -26,12 +26,13 @@ import (
 var Version string
 
 type Riex struct {
-	config      aws.Config
-	ec2         *ec2.Client
-	elasticache *elasticache.Client
-	rds         *rds.Client
-	redshift    *redshift.Client
-	opensearch  *opensearch.Client
+	config         aws.Config
+	ec2            *ec2.Client
+	elasticache    *elasticache.Client
+	rds            *rds.Client
+	redshift       *redshift.Client
+	opensearch     *opensearch.Client
+	recognizedTags map[string]string
 
 	option    *Option
 	startTime time.Time
@@ -47,15 +48,16 @@ func New(ctx context.Context, opt *Option) (*Riex, error) {
 
 	now := time.Now()
 	app := &Riex{
-		config:      awscfg,
-		ec2:         ec2.NewFromConfig(awscfg),
-		elasticache: elasticache.NewFromConfig(awscfg),
-		rds:         rds.NewFromConfig(awscfg),
-		redshift:    redshift.NewFromConfig(awscfg),
-		opensearch:  opensearch.NewFromConfig(awscfg),
-		option:      opt,
-		startTime:   now.Add(time.Duration(-opt.Expired) * 24 * time.Hour),
-		endTime:     now.Add(time.Duration(opt.Days) * 24 * time.Hour),
+		config:         awscfg,
+		ec2:            ec2.NewFromConfig(awscfg),
+		elasticache:    elasticache.NewFromConfig(awscfg),
+		rds:            rds.NewFromConfig(awscfg),
+		redshift:       redshift.NewFromConfig(awscfg),
+		opensearch:     opensearch.NewFromConfig(awscfg),
+		option:         opt,
+		startTime:      now.Add(time.Duration(-opt.Expired) * 24 * time.Hour),
+		endTime:        now.Add(time.Duration(opt.Days) * 24 * time.Hour),
+		recognizedTags: opt.RecognizedTags,
 	}
 	return app, nil
 }
@@ -189,6 +191,13 @@ func (app *Riex) PrintTSV(ris ReservedInstances, w io.Writer) error {
 }
 
 func (app *Riex) isPrintable(ri ReservedInstance) bool {
+	if len(app.recognizedTags) > 0 {
+		for key, recognizedValue := range app.recognizedTags {
+			if v, ok := ri.Tags[key]; ok && recognizedValue == v {
+				return false
+			}
+		}
+	}
 	if app.option.Active && strings.ToLower(ri.State) == "active" {
 		return true
 	}
@@ -199,14 +208,15 @@ func (app *Riex) isPrintable(ri ReservedInstance) bool {
 }
 
 type ReservedInstance struct {
-	Service      string    `json:"service"`
-	Name         string    `json:"name"`
-	Description  string    `json:"description"`
-	InstanceType string    `json:"instance_type"`
-	Count        int       `json:"count"`
-	StartTime    time.Time `json:"start_time"`
-	EndTime      time.Time `json:"end_time"`
-	State        string    `json:"state"`
+	Service      string            `json:"service"`
+	Name         string            `json:"name"`
+	Description  string            `json:"description"`
+	InstanceType string            `json:"instance_type"`
+	Count        int               `json:"count"`
+	StartTime    time.Time         `json:"start_time"`
+	EndTime      time.Time         `json:"end_time"`
+	State        string            `json:"state"`
+	Tags         map[string]string `json:"tags,omitempty"`
 }
 
 type ReservedInstances []ReservedInstance

@@ -14,6 +14,10 @@ func (app *Riex) detectEC2(ctx context.Context) (*ReservedInstances, error) {
 		return nil, err
 	}
 	for _, ins := range out.ReservedInstances {
+		tags := make(map[string]string, len(ins.Tags))
+		for _, tag := range ins.Tags {
+			tags[*tag.Key] = *tag.Value
+		}
 		ri := ReservedInstance{
 			Service:      "EC2",
 			InstanceType: string(ins.InstanceType),
@@ -23,6 +27,7 @@ func (app *Riex) detectEC2(ctx context.Context) (*ReservedInstances, error) {
 			StartTime:    aws.ToTime(ins.Start),
 			EndTime:      aws.ToTime(ins.End),
 			State:        string(ins.State),
+			Tags:         tags,
 		}
 		if app.isPrintable(ri) {
 			ris = append(ris, ri)

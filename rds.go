@@ -2,6 +2,7 @@ package riex
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -19,6 +20,19 @@ func (app *Riex) detectRDS(ctx context.Context) (*ReservedInstances, error) {
 			return nil, err
 		}
 		for _, ins := range page.ReservedDBInstances {
+			var tags map[string]string
+			listTagsOutput, err := app.rds.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
+				ResourceName: ins.ReservedDBInstanceArn,
+			})
+			if err == nil {
+				tags = make(map[string]string, len(listTagsOutput.TagList))
+				for _, tag := range listTagsOutput.TagList {
+					tags[*tag.Key] = *tag.Value
+				}
+			} else {
+				log.Println("[warn] failed to get tags for", ins.ReservedDBInstanceArn, ":", err)
+				tags = make(map[string]string)
+			}
 			ri := ReservedInstance{
 				Service:      "RDS",
 				InstanceType: aws.ToString(ins.DBInstanceClass),
@@ -28,6 +42,7 @@ func (app *Riex) detectRDS(ctx context.Context) (*ReservedInstances, error) {
 				StartTime:    aws.ToTime(ins.StartTime),
 				EndTime:      ins.StartTime.Add(time.Second * time.Duration(ins.Duration)),
 				State:        aws.ToString(ins.State),
+				Tags:         tags,
 			}
 			if app.isPrintable(ri) {
 				ris = append(ris, ri)
