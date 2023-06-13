@@ -2,6 +2,7 @@ package riex
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -19,6 +20,19 @@ func (app *Riex) detectElastiCache(ctx context.Context) (*ReservedInstances, err
 			return nil, err
 		}
 		for _, node := range page.ReservedCacheNodes {
+			var tags map[string]string
+			listTagsOutput, err := app.elasticache.ListTagsForResource(ctx, &elasticache.ListTagsForResourceInput{
+				ResourceName: node.ReservationARN,
+			})
+			if err == nil {
+				tags = make(map[string]string, len(listTagsOutput.TagList))
+				for _, tag := range listTagsOutput.TagList {
+					tags[*tag.Key] = *tag.Value
+				}
+			} else {
+				log.Println("[warn] failed to get tags for", node.ReservationARN, ":", err)
+				tags = make(map[string]string)
+			}
 			ri := ReservedInstance{
 				Service:      "ElastiCache",
 				InstanceType: aws.ToString(node.CacheNodeType),
@@ -28,6 +42,7 @@ func (app *Riex) detectElastiCache(ctx context.Context) (*ReservedInstances, err
 				StartTime:    aws.ToTime(node.StartTime),
 				EndTime:      node.StartTime.Add(time.Second * time.Duration(node.Duration)),
 				State:        aws.ToString(node.State),
+				Tags:         tags,
 			}
 			if app.isPrintable(ri) {
 				ris = append(ris, ri)

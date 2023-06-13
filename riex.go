@@ -189,6 +189,13 @@ func (app *Riex) PrintTSV(ris ReservedInstances, w io.Writer) error {
 }
 
 func (app *Riex) isPrintable(ri ReservedInstance) bool {
+	if len(app.option.IgnoreTags) > 0 {
+		for key, value := range app.option.IgnoreTags {
+			if tag, ok := ri.Tags[key]; ok && value == tag {
+				return false
+			}
+		}
+	}
 	if app.option.Active && strings.ToLower(ri.State) == "active" {
 		return true
 	}
@@ -199,14 +206,15 @@ func (app *Riex) isPrintable(ri ReservedInstance) bool {
 }
 
 type ReservedInstance struct {
-	Service      string    `json:"service"`
-	Name         string    `json:"name"`
-	Description  string    `json:"description"`
-	InstanceType string    `json:"instance_type"`
-	Count        int       `json:"count"`
-	StartTime    time.Time `json:"start_time"`
-	EndTime      time.Time `json:"end_time"`
-	State        string    `json:"state"`
+	Service      string            `json:"service"`
+	Name         string            `json:"name"`
+	Description  string            `json:"description"`
+	InstanceType string            `json:"instance_type"`
+	Count        int               `json:"count"`
+	StartTime    time.Time         `json:"start_time"`
+	EndTime      time.Time         `json:"end_time"`
+	State        string            `json:"state"`
+	Tags         map[string]string `json:"tags,omitempty"`
 }
 
 type ReservedInstances []ReservedInstance

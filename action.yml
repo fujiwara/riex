@@ -8,6 +8,9 @@ inputs:
   dummy_end_time:
     description: "Dummy end time for testing"
     required: false
+  ignore_tags:
+    description: "Semicolon-separated list of tags to ignore. eg 'key1=value1;key2=value2'"
+    required: false
   version:
     description: "Version of riex to use"
     default: "0.0.5"
@@ -29,6 +32,9 @@ runs:
         days_left=${{ inputs.days_left }}
         if [[ "${{ inputs.dummy_end_time }}" != "" ]]; then
           opts="--dummy-output --dummy-end-time ${{ inputs.dummy_end_time }}"
+        fi
+        if [[ "${{ inputs.ignore_tags }}" != "" ]]; then
+          opts="$opts --ignore-tags ${{ inputs.ignore_tags }}"
         fi
         output=$(riex $days_left --format markdown $opts)
 
