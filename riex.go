@@ -189,7 +189,7 @@ func (app *Riex) PrintTSV(ris ReservedInstances, w io.Writer) error {
 }
 
 func (app *Riex) isPrintable(ri ReservedInstance) bool {
-	if !app.option.Ignored && len(app.option.IgnoreTags) > 0 {
+	if len(app.option.IgnoreTags) > 0 {
 		for key, value := range app.option.IgnoreTags {
 			if tag, ok := ri.Tags[key]; ok && value == tag {
 				return false
