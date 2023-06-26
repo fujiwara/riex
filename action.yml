@@ -13,7 +13,7 @@ inputs:
     required: false
   version:
     description: "Version of riex to use"
-    default: "0.0.5"
+    default: "0.0.6"
 
 runs:
   using: "composite"
