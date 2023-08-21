@@ -157,7 +157,7 @@ func (app *Riex) PrintMarkdown(ris ReservedInstances, w io.Writer) error {
 		fmt.Fprintf(w,
 			"| %s | %s | %s | %s | %d | %s | %s | %s |\n",
 			ri.Service, ri.Name, ri.Description, ri.InstanceType,
-			ri.Count, ri.StartTime.Format(time.RFC3339), ri.EndTime.Format(time.RFC3339),
+			ri.Count, app.formatTime(ri.StartTime), app.formatTime(ri.EndTime),
 			ri.State,
 		)
 	}
@@ -179,8 +179,8 @@ func (app *Riex) PrintTSV(ris ReservedInstances, w io.Writer) error {
 			ri.Description,
 			ri.InstanceType,
 			strconv.Itoa(ri.Count),
-			ri.StartTime.Format(time.RFC3339),
-			ri.EndTime.Format(time.RFC3339),
+			app.formatTime(ri.StartTime),
+			app.formatTime(ri.EndTime),
 			ri.State,
 		}
 		fmt.Fprintln(w, strings.Join(row, "\t"))
@@ -203,6 +203,14 @@ func (app *Riex) isPrintable(ri ReservedInstance) bool {
 		return true
 	}
 	return false
+}
+
+func (app *Riex) formatTime(t time.Time) string {
+	if app.option.LocalTime {
+		return t.Local().Format(time.RFC3339)
+	} else {
+		return t.Format(time.RFC3339)
+	}
 }
 
 type ReservedInstance struct {
