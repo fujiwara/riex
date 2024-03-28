@@ -199,6 +199,9 @@ func (app *Riex) isPrintable(ri ReservedInstance) bool {
 	if app.option.Active && strings.ToLower(ri.State) == "active" {
 		return true
 	}
+	if app.option.Pending && strings.ToLower(ri.State) == "payment-pending" {
+		return true
+	}
 	if ri.EndTime.After(app.startTime) && ri.EndTime.Before(app.endTime) {
 		return true
 	}
