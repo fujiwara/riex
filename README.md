@@ -27,8 +27,11 @@ Arguments:
 Flags:
   -h, --help                         Show context-sensitive help.
       --active                       Show active reserved instances.
+      --pending                      Show payment-pending reserved instances.
       --expired=INT                  Show reserved instances expired in the last specified days.
       --format="json"                Output format.(json, markdown, tsv)
+      --dummy-output                 Dummy output for testing.
+      --dummy-end-time=TIME          Endtime for testing. works only with --dummy-output.
       --ignore-tags=KEY=VALUE;...    Resource tag for ignore RI.
       --local-time                   Use local time for output.
 ```
