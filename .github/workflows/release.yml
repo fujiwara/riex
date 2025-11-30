@@ -3,9 +3,7 @@ name: release
 on:
   push:
     branches:
-      - "!**/*"
-    tags:
-      - "v*"
+      - main
 
 jobs:
   goreleaser:
