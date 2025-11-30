@@ -38,9 +38,9 @@ func (app *Riex) detectRDS(ctx context.Context) (*ReservedInstances, error) {
 				InstanceType: aws.ToString(ins.DBInstanceClass),
 				Name:         aws.ToString(ins.ReservedDBInstanceId),
 				Description:  aws.ToString(ins.ProductDescription),
-				Count:        int(ins.DBInstanceCount),
+				Count:        int(aws.ToInt32(ins.DBInstanceCount)),
 				StartTime:    aws.ToTime(ins.StartTime),
-				EndTime:      ins.StartTime.Add(time.Second * time.Duration(ins.Duration)),
+				EndTime:      ins.StartTime.Add(time.Second * time.Duration(int64(aws.ToInt32(ins.Duration)))),
 				State:        aws.ToString(ins.State),
 				Tags:         tags,
 			}

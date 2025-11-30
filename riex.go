@@ -23,8 +23,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/redshift"
 )
 
-var Version string
-
 type Riex struct {
 	config      aws.Config
 	ec2         *ec2.Client

@@ -38,9 +38,9 @@ func (app *Riex) detectElastiCache(ctx context.Context) (*ReservedInstances, err
 				InstanceType: aws.ToString(node.CacheNodeType),
 				Name:         aws.ToString(node.ReservedCacheNodeId),
 				Description:  aws.ToString(node.ProductDescription),
-				Count:        int(node.CacheNodeCount),
+				Count:        int(aws.ToInt32(node.CacheNodeCount)),
 				StartTime:    aws.ToTime(node.StartTime),
-				EndTime:      node.StartTime.Add(time.Second * time.Duration(node.Duration)),
+				EndTime:      node.StartTime.Add(time.Second * time.Duration(int64(aws.ToInt32(node.Duration)))),
 				State:        aws.ToString(node.State),
 				Tags:         tags,
 			}

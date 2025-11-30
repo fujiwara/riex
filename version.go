@@ -1,0 +1,3 @@
+package riex
+
+var Version = "v0.0.7"

@@ -17,6 +17,7 @@ type Option struct {
 	DummyEndTime time.Time         `help:"Endtime for testing. works only with --dummy-output."`
 	IgnoreTags   map[string]string `help:"Resource tag for ignore RI."`
 	LocalTime    bool              `help:"Use local time for output."`
+	Version      kong.VersionFlag  `help:"Show version and exit." short:"v"`
 }
 
 func RunCLI(ctx context.Context, args []string) error {

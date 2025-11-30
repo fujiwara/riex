@@ -112,7 +112,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # or use aws-actions/configure-aws-credentials in before step
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'your-aws-region'
-
+```
 
 ## LICENSE
 
