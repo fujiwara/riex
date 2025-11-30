@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.0.9](https://github.com/fujiwara/riex/compare/v0.0.8...v0.0.9) - 2025-11-30
+
 ## [v0.0.8](https://github.com/fujiwara/riex/compare/v0.0.7...v0.0.8) - 2025-11-30
 - update aws-sdk-go-v2 to latest by @fujiwara in https://github.com/fujiwara/riex/pull/7
 
