@@ -24,9 +24,9 @@ func (app *Riex) detectRedshift(ctx context.Context) (*ReservedInstances, error)
 				InstanceType: aws.ToString(node.NodeType),
 				Name:         aws.ToString(node.ReservedNodeId),
 				Description:  "",
-				Count:        int(node.NodeCount),
+				Count:        int(aws.ToInt32(node.NodeCount)),
 				StartTime:    aws.ToTime(node.StartTime),
-				EndTime:      node.StartTime.Add(time.Second * time.Duration(node.Duration)),
+				EndTime:      node.StartTime.Add(time.Second * time.Duration(int64(aws.ToInt32(node.Duration)))),
 				State:        aws.ToString(node.State),
 				Tags:         make(map[string]string), // redshift reserved instance does not support tags
 			}
@@ -36,5 +36,4 @@ func (app *Riex) detectRedshift(ctx context.Context) (*ReservedInstances, error)
 		}
 	}
 	return &ris, nil
-
 }
